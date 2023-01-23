@@ -6,12 +6,12 @@ using System.Diagnostics;
 
 namespace EntityFrameworkMigrationTest
 {
-    public class ParentRepositoryTest
+    public class ParentServiceRepositoryTest
     {
         private readonly test_localContext _context;
         private readonly ParentServiceRepository _parentRepository;
 
-        public ParentRepositoryTest()
+        public ParentServiceRepositoryTest()
         {
             var optionsBuilder = new DbContextOptionsBuilder<test_localContext>();
             optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=test_local;User Id=postgres;Password='root';");
@@ -137,6 +137,10 @@ namespace EntityFrameworkMigrationTest
             _context.ThirdChild.Count(x => x.IdSecondChild == 111).Should().Be(0);
         }
 
+        /// <summary>
+        /// Create a Parent object, which contains a FirstChild object, which contains a SecondChild object, which contains a ThirdChild object
+        /// All these objects are stored into the database
+        /// </summary>
         private void CreateInitialParentInTheDB()
         {
             var parent = new Parent
@@ -173,6 +177,34 @@ namespace EntityFrameworkMigrationTest
             _context.SaveChanges();
         }
 
+        /// <summary>
+        /// Create a Parent object, that will be used to update the Parent object stored into the database
+        /// </summary>
+        /// <param name="includeFirstChild1">
+        /// If true, nothing will happen at this level, because the Parent object stored into the database already contains FirstChild1
+        /// If false, the new Parent object will not contain FirstChild1. So FirstChild1 will be removed from the DB
+        /// </param>
+        /// <param name="includeFirstChild2">
+        /// If true, the new Parent object will contain a new object FirstChild2. So FirstChild2 will be added to the DB
+        /// If false, nothing will happen at this level, because the Parent object stored into the database does not contain FirstChild2
+        /// </param>
+        /// <param name="includeSecondChild1">
+        /// If true, nothing will happen at this level, because the Parent object stored into the database already contains SecondChild1
+        /// If false, the new Parent object will not contain SecondChild1. So SecondChild1 will be removed from the DB
+        /// </param>
+        /// <param name="includeSecondChild2">
+        /// If true, the new Parent object will contain a new object SecondChild2. So SecondChild2 will be added to the DB
+        /// If false, nothing will happen at this level, because the Parent object stored into the database does not contain SecondChild2
+        /// </param>
+        /// <param name="includeThirdChild1">
+        /// If true, nothing will happen at this level, because the Parent object stored into the database already contains ThirdChild1
+        /// If false, the new Parent object will not contain ThirdChild1. So ThirdChild1 will be removed from the DB
+        /// </param>
+        /// <param name="includeThirdChild2">
+        /// If true, the new Parent object will contain a new object ThirdChild2. So ThirdChild2 will be added to the DB
+        /// If false, nothing will happen at this level, because the Parent object stored into the database does not contain ThirdChild2
+        /// </param>
+        /// <returns></returns>
         private Parent CreateNewParent(bool includeFirstChild1 = false, bool includeFirstChild2 = false, 
             bool includeSecondChild1 = false, bool includeSecondChild2 = false, 
             bool includeThirdChild1 = false, bool includeThirdChild2 = false)
